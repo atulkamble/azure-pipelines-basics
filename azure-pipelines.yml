@@ -1,0 +1,22 @@
+trigger:
+- main   # Run pipeline when code is pushed to main branch
+
+pool:
+  vmImage: ubuntu-latest   # Agent image
+
+steps:
+- task: UseNode@2
+  inputs:
+    version: '18.x'
+
+- script: npm install
+  displayName: 'Install dependencies'
+
+- script: npm test
+  displayName: 'Run tests'
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'my-azure-connection'
+    appName: 'my-nodejs-app'
+    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
