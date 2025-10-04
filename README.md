@@ -1,61 +1,110 @@
-## **Azure Pipelines basics** 👇
+# **Azure Pipelines Basics** 🚀
+
+---
+
+## 📑 Table of Contents
+
+1. [What is Azure Pipelines?](#-what-is-azure-pipelines)
+2. [Key Concepts](#-key-concepts)
+3. [Basic YAML Snippets](#-basic-yaml-snippets)
+4. [Sample Pipelines](#-sample-pipelines)
+
+   * [Hello World](#1-hello-world-pipeline-ubuntu-agent)
+   * [Environment Variables](#2-echo-environment-variables)
+   * [Python Script](#3-run-python-script)
+   * [Node.js App](#4-run-nodejs-app)
+   * [.NET Build](#5-simple-net-build)
+   * [Bash Commands](#6-run-bash-commands)
+   * [PowerShell Commands](#7-run-powershell-commands)
+   * [Docker Build & Push](#8-docker-build--push-to-acr)
+   * [Deploy Node.js App](#9-nodejs-app-deploy-to-azure-web-app)
+   * [Artifacts](#10-copy-files-to-artifact)
+   * [Deploy Static Website](#11-deploy-static-website-to-azure-app-service)
+5. [Workflow](#-workflow)
+6. [Benefits](#-benefits)
 
 ---
 
 ## 🚀 What is Azure Pipelines?
 
-Azure Pipelines (part of **Azure DevOps**) is a **CI/CD (Continuous Integration & Continuous Delivery) service**.
-It lets you **automate builds, tests, and deployments** across platforms like **Azure, AWS, GCP, on-prem servers, or containers**.
+Azure Pipelines (part of **Azure DevOps**) is a **CI/CD service** that helps you:
 
-It works with **any language, any platform, any cloud**:
+✅ Automate builds, tests, and deployments.
+✅ Deliver to **Azure, AWS, GCP, Kubernetes, Docker, or on-prem servers**.
+✅ Work with **any language, any platform, any cloud**.
 
 * **Languages**: Java, Python, .NET, Node.js, Go, PHP, etc.
-* **Targets**: Azure, AWS, GCP, VMs, Kubernetes, Docker, or even on-prem servers.
+* **Targets**: VMs, Kubernetes clusters, Containers, App Services, or Hybrid environments.
 
 ---
 
 ## ⚙️ Key Concepts
 
-1. **Pipeline**
-
-   * A process that defines how code moves from commit → build → test → deploy.
-   * Defined in a **YAML file** (`azure-pipelines.yml`) stored in your repo.
-
-2. **Stages**
-
-   * Logical sections in the pipeline (e.g., *Build*, *Test*, *Deploy*).
-
-3. **Jobs**
-
-   * A collection of steps that run on an **agent** (machine).
-
-4. **Steps**
-
-   * Individual tasks (like installing dependencies, running tests, deploying).
-
-5. **Agents**
-
-   * The machine that executes the jobs.
-   * Microsoft-hosted agents (ready to use) or self-hosted agents (your own servers).
+* **Pipeline** → Defines the CI/CD process. Written in `azure-pipelines.yml`.
+* **Stages** → Logical divisions (Build, Test, Deploy).
+* **Jobs** → A group of steps running on an agent.
+* **Steps** → Individual tasks (install, test, deploy).
+* **Agents** → Machines that run jobs. (Microsoft-hosted or Self-hosted).
 
 ---
 
-## 📝 Sample Pipelines (`azure-pipelines.yml`)
+## 📝 Basic YAML Snippets
 
-Here’s a set of **very basic Azure Pipelines YAML codes** you can use as starting points.
-These are minimal examples for common scenarios:
+### 1. Hello World (print only)
+
+```yaml
+steps:
+- script: echo Hello, Azure Pipelines!
+```
+
+### 2. Use Ubuntu Agent
+
+```yaml
+pool: { vmImage: 'ubuntu-latest' }
+steps:
+- script: echo Running on Ubuntu
+```
+
+### 3. Multi-step
+
+```yaml
+steps:
+- script: echo Step 1
+- script: echo Step 2
+- script: echo Step 3
+```
+
+### 4. Job Example
+
+```yaml
+jobs:
+- job: Build
+  steps:
+  - script: echo Building...
+```
+
+### 5. Stage + Job + Step
+
+```yaml
+stages:
+- stage: Demo
+  jobs:
+  - job: Run
+    steps:
+    - script: echo Inside Stage → Job → Step
+```
 
 ---
+
+## 🛠 Sample Pipelines
 
 ### 1. Hello World Pipeline (Ubuntu Agent)
 
 ```yaml
 trigger:
 - main
-
 pool:
   vmImage: ubuntu-latest
-
 steps:
 - script: echo "Hello, Azure Pipelines 👋"
   displayName: "Print Hello World"
@@ -66,12 +115,6 @@ steps:
 ### 2. Echo Environment Variables
 
 ```yaml
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
 steps:
 - script: |
     echo "Build ID: $(Build.BuildId)"
@@ -84,17 +127,10 @@ steps:
 ### 3. Run Python Script
 
 ```yaml
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
 steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '3.x'
-
 - script: python hello.py
   displayName: "Run Python Script"
 ```
@@ -104,17 +140,10 @@ steps:
 ### 4. Run Node.js App
 
 ```yaml
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
 steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '18.x'
-
 - script: |
     npm install
     npm run build
@@ -126,18 +155,11 @@ steps:
 ### 5. Simple .NET Build
 
 ```yaml
-trigger:
-- main
-
-pool:
-  vmImage: windows-latest
-
 steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
     version: '8.x'
-
 - script: dotnet build --configuration Release
   displayName: "Build .NET Project"
 ```
@@ -147,12 +169,6 @@ steps:
 ### 6. Run Bash Commands
 
 ```yaml
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
 steps:
 - script: |
     pwd
@@ -166,12 +182,6 @@ steps:
 ### 7. Run PowerShell Commands
 
 ```yaml
-trigger:
-- main
-
-pool:
-  vmImage: windows-latest
-
 steps:
 - powershell: |
     Get-Date
@@ -184,15 +194,8 @@ steps:
 ### 8. Docker Build & Push to ACR
 
 ```yaml
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
 variables:
   imageName: 'myapp'
-
 steps:
 - task: Docker@2
   inputs:
@@ -209,23 +212,12 @@ steps:
 ### 9. Node.js App Deploy to Azure Web App
 
 ```yaml
-trigger:
-- main   # Run pipeline when code is pushed to main branch
-
-pool:
-  vmImage: ubuntu-latest   # Agent image
-
 steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '18.x'
-
 - script: npm install
-  displayName: 'Install dependencies'
-
 - script: npm test
-  displayName: 'Run tests'
-
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'my-azure-connection'
@@ -238,16 +230,8 @@ steps:
 ### 10. Copy Files to Artifact
 
 ```yaml
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
 steps:
 - script: echo "Build output" > output.txt
-  displayName: "Generate File"
-
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: 'output.txt'
@@ -259,12 +243,6 @@ steps:
 ### 11. Deploy Static Website to Azure App Service
 
 ```yaml
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
 steps:
 - task: AzureWebApp@1
   inputs:
@@ -288,7 +266,8 @@ steps:
 
 * Automates repetitive tasks.
 * Improves release speed & quality.
-* Integrates with **GitHub, Bitbucket, or Azure Repos**.
-* Works across **multi-cloud + hybrid environments**.
+* Integrates with **GitHub, Bitbucket, Azure Repos**.
+* Works across **multi-cloud & hybrid environments**.
 
 ---
+
