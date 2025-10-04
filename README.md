@@ -1,15 +1,16 @@
-##  **Azure Pipelines basics** 👇
+# ## **Azure Pipelines basics** 👇
 
 ---
 
 ## 🚀 What is Azure Pipelines?
 
-Azure Pipelines (part of **Azure DevOps**) is a **CI/CD (Continuous Integration & Continuous Delivery) service**. It lets you **automate builds, tests, and deployments** across platforms like **Azure, AWS, GCP, on-prem servers, or containers**.
+Azure Pipelines (part of **Azure DevOps**) is a **CI/CD (Continuous Integration & Continuous Delivery) service**.
+It lets you **automate builds, tests, and deployments** across platforms like **Azure, AWS, GCP, on-prem servers, or containers**.
 
-It works with **any language, any platform, any cloud**.
+It works with **any language, any platform, any cloud**:
 
-* Languages: Java, Python, .NET, Node.js, Go, PHP, etc.
-* Targets: Azure, AWS, GCP, VMs, Kubernetes, Docker, or even on-prem servers.
+* **Languages**: Java, Python, .NET, Node.js, Go, PHP, etc.
+* **Targets**: Azure, AWS, GCP, VMs, Kubernetes, Docker, or even on-prem servers.
 
 ---
 
@@ -39,16 +40,16 @@ It works with **any language, any platform, any cloud**.
 
 ---
 
-## 📝 Sample Pipeline (azure-pipelines.yml)
+## 📝 Sample Pipelines (`azure-pipelines.yml`)
 
-Here’s a set of **very basic Azure Pipelines YAML codes** you can use as starting points. These are minimal examples for common scenarios:
+Here’s a set of **very basic Azure Pipelines YAML codes** you can use as starting points.
+These are minimal examples for common scenarios:
 
 ---
 
-## 1. Hello World Pipeline (Ubuntu Agent)
+### 1. Hello World Pipeline (Ubuntu Agent)
 
 ```yaml
-# azure-pipelines.yml
 trigger:
 - main
 
@@ -62,7 +63,25 @@ steps:
 
 ---
 
-## 2. Run Python Script
+### 2. Echo Environment Variables
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: |
+    echo "Build ID: $(Build.BuildId)"
+    echo "Branch: $(Build.SourceBranchName)"
+  displayName: "Print Pipeline Variables"
+```
+
+---
+
+### 3. Run Python Script
 
 ```yaml
 trigger:
@@ -82,7 +101,7 @@ steps:
 
 ---
 
-## 3. Run Node.js App
+### 4. Run Node.js App
 
 ```yaml
 trigger:
@@ -104,7 +123,7 @@ steps:
 
 ---
 
-## 4. Simple .NET Build
+### 5. Simple .NET Build
 
 ```yaml
 trigger:
@@ -125,7 +144,44 @@ steps:
 
 ---
 
-## 5. Docker Build & Push to ACR
+### 6. Run Bash Commands
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: |
+    pwd
+    ls -l
+    echo "Pipeline running on Ubuntu"
+  displayName: "Run Basic Bash Commands"
+```
+
+---
+
+### 7. Run PowerShell Commands
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+steps:
+- powershell: |
+    Get-Date
+    Write-Output "Hello from PowerShell"
+  displayName: "Run PowerShell Commands"
+```
+
+---
+
+### 8. Docker Build & Push to ACR
 
 ```yaml
 trigger:
@@ -148,6 +204,10 @@ steps:
       $(Build.BuildId)
 ```
 
+---
+
+### 9. Node.js App Deploy to Azure Web App
+
 ```yaml
 trigger:
 - main   # Run pipeline when code is pushed to main branch
@@ -156,9 +216,9 @@ pool:
   vmImage: ubuntu-latest   # Agent image
 
 steps:
-- task: UseNode@2
+- task: NodeTool@0
   inputs:
-    version: '18.x'
+    versionSpec: '18.x'
 
 - script: npm install
   displayName: 'Install dependencies'
@@ -170,6 +230,46 @@ steps:
   inputs:
     azureSubscription: 'my-azure-connection'
     appName: 'my-nodejs-app'
+    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+```
+
+---
+
+### 10. Copy Files to Artifact
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo "Build output" > output.txt
+  displayName: "Generate File"
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: 'output.txt'
+    artifactName: 'drop'
+```
+
+---
+
+### 11. Deploy Static Website to Azure App Service
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'my-azure-connection'
+    appName: 'my-static-site'
     package: '$(System.DefaultWorkingDirectory)/**/*.zip'
 ```
 
@@ -188,7 +288,7 @@ steps:
 
 * Automates repetitive tasks.
 * Improves release speed & quality.
-* Integrates with GitHub, Bitbucket, or Azure Repos.
+* Integrates with **GitHub, Bitbucket, or Azure Repos**.
 * Works across **multi-cloud + hybrid environments**.
 
 ---
