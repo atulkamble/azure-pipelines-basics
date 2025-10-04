@@ -41,6 +41,113 @@ It works with **any language, any platform, any cloud**.
 
 ## 📝 Sample Pipeline (azure-pipelines.yml)
 
+Here’s a set of **very basic Azure Pipelines YAML codes** you can use as starting points. These are minimal examples for common scenarios:
+
+---
+
+## 1. Hello World Pipeline (Ubuntu Agent)
+
+```yaml
+# azure-pipelines.yml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo "Hello, Azure Pipelines 👋"
+  displayName: "Print Hello World"
+```
+
+---
+
+## 2. Run Python Script
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.x'
+
+- script: python hello.py
+  displayName: "Run Python Script"
+```
+
+---
+
+## 3. Run Node.js App
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+
+- script: |
+    npm install
+    npm run build
+  displayName: "Install & Build Node.js App"
+```
+
+---
+
+## 4. Simple .NET Build
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'
+
+- script: dotnet build --configuration Release
+  displayName: "Build .NET Project"
+```
+
+---
+
+## 5. Docker Build & Push to ACR
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  imageName: 'myapp'
+
+steps:
+- task: Docker@2
+  inputs:
+    containerRegistry: 'myACRServiceConnection'
+    repository: '$(imageName)'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      $(Build.BuildId)
+```
+
 ```yaml
 trigger:
 - main   # Run pipeline when code is pushed to main branch
